@@ -2,5 +2,188 @@
 *,
 *:before,
 *:after {
-  box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+/******* General Styling ***************/
+
+:root {
+	--back-1: #ebfdff;
+	--back-2: #0ae2ff;
+	--text-1: #221510;
+
+	font-family: helvetica, arial, sans-serif;
+}
+
+body {
+	margin: 0;
+}
+
+#wrapper {
+	width: 100vw;
+	height: 100vh;
+	position: relative;
+	padding: 1rem 0.5rem;
+	background-color: var(--back-1);
+	color: var(--text-1);
+}
+
+header {
+	display: flex;
+	justify-content: space-between;
+	padding: 1rem 0;
+
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
+}
+
+.siteName {
+	font-size: 2rem;
+}
+
+#main-nav {
+	background-color: var(--back-2);
+	color: var(--text-1);
+
+	ul {
+		padding: 0;
+		display: flex;
+		justify-content: space-around;
+	}
+
+	li {
+		list-style: none;
+		display: block;
+	}
+
+	a {
+		color: inherit;
+		text-decoration: none;
+		padding: 13px 8.25px;
+		display: block;
+	}
+}
+
+footer {
+	margin-top: 2rem;
+}
+
+@media screen and (min-width: 600px) {
+	body {
+		background: url('/images/site/checkerboard.jpg') top left/512px;
+		padding: 1rem;
+	}
+
+	#wrapper {
+		max-width: 620px;
+		border: 3px solid var(--back-2);
+		border-radius: 1rem;
+		margin: auto;
+	}
+}
+
+/******* Index Styling ***************/
+
+h2 {
+	font-size: 1.5rem;
+	font-weight: bold;
+}
+
+#hero-section {
+	position: relative;
+
+	img {
+		width: 100%;
+		height: auto;
+	}
+
+	div {
+		position: absolute;
+		top: 0;
+		left: 0;
+		background-color: color-mix(in oklab, var(--back-2), transparent 50%);
+		padding: 0.25rem;
+	}
+
+	h2, p {
+		margin: 0;
+	}
+
+	a {
+		display: block;
+		padding: 13px;
+		background-color: var(--back-2);
+		color: inherit;
+		text-decoration: none;
+		width: fit-content;
+		margin-top: 0.25rem;
+	}
+}
+
+#review-section {
+	ul {
+		padding-inline-start: 20px;
+	}
+	li {
+		margin: 1rem 0;
+	}
+}
+
+#upgrade-section {
+	display: grid;
+	grid-auto-columns: 1fr 1fr;
+	text-align: center;
+	gap: 0.5rem;
+
+	h2 {
+		grid-column: 1/3;
+		text-align: initial;
+	}
+
+	.upgrade-card {
+		display: flex;
+		flex-direction: column;
+
+		div {
+			background-color: var(--back-2);
+			padding: 0.5rem;
+			flex-grow: 1;
+			border: 1px solid var(--text-1);
+			margin-bottom: 0.125rem;
+		}
+	}
+}
+
+@media screen and (min-width: 600px) {
+	main {
+		display: grid;
+		gap: 1rem;
+		grid-template-areas: 
+			"head head"
+			"hero hero"
+			"upgd revw";
+	}
+
+	h1 {
+		grid-area: head;
+	}
+
+	#hero-section {
+		font-size: 1.5rem;
+		grid-area: hero;
+
+		a {
+			margin: 1.5rem 1rem 1rem;
+		}
+	}
+
+	#upgrade-section {
+		grid-area: upgd;
+	}
+
+	#review-section {
+		grid-area: revw;
+	}
 }
