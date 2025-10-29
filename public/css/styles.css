@@ -56,6 +56,7 @@ header {
 	li {
 		list-style: none;
 		display: block;
+		flex-grow: 1;
 	}
 
 	a {
@@ -63,7 +64,9 @@ header {
 		text-decoration: none;
 		padding: 13px 8.25px;
 		display: block;
+		text-align: center;
 	}
+
 }
 
 footer {
@@ -74,6 +77,10 @@ footer {
 	body {
 		background: url('/images/site/checkerboard.jpg') top left/512px;
 		padding: 1rem;
+	}
+
+	#main-nav a:hover {
+		background-color: rgba(255, 255, 255, 0.5);
 	}
 
 	#wrapper {
@@ -171,7 +178,7 @@ h2 {
 	}
 
 	#hero-section {
-		font-size: 1.5rem;
+		font-size: 1.33rem;
 		grid-area: hero;
 
 		a {
