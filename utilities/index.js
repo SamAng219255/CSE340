@@ -57,6 +57,28 @@ Util.buildClassificationGrid = async function(data){
   return grid
 }
 
+/* **************************************
+* Build the classification view HTML
+* ************************************ */
+Util.buildVehicleDescription = async function(data){
+  return `
+    <img class="vehicle-img" src="${data.inv_image}" alt="Image of a ${data.inv_make} ${data.inv_model} car.">
+    <div class="vehicle-desc">
+      <h2>${data.inv_make} ${data.inv_model} Details</h2>
+      <ul>
+        <li><b>Make:</b> ${data.inv_make}</li>
+        <li><b>Model:</b> ${data.inv_model}</li>
+        <li><b>Year:</b> ${data.inv_year}</li>
+        <li><b>Price:</b> $${parseFloat(data.inv_price).toLocaleString('en-US')}</li>
+        <li><b>Miles:</b> ${parseFloat(data.inv_miles).toLocaleString('en-US')}</li>
+        <li><b>Color:</b> ${data.inv_color}</li>
+      </ul>
+      <p><b>Description</b></p>
+      <p>${data.inv_description}</p>
+    </div>
+  `;
+}
+
 /* ****************************************
  * Middleware For Handling Errors
  * Wrap other function in this for 
