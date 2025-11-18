@@ -1,0 +1,6 @@
+#login-box {
+	background-color: var(--back-2-transparent);
+	border: 2px solid var(--back-2);
+	border-radius: 1rem;
+	padding: 1rem;
+}

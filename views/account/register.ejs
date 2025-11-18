@@ -1,0 +1,55 @@
+<h1><%= title %></h1>
+
+<%- messages() %>
+
+<div id="login-box">
+  <% if (errors) { %>
+    <ul class="error-notice">
+   <% errors.array().forEach(error => { %>
+     <li><%= error.msg %></li>
+  <%  }) %>
+   </ul>
+  <% } %>
+  <form action="/account/register" method="post">
+    <label>
+      First Name
+      <input type="text" autocomplete="given-name" name="account_firstname" required>
+      <span class="required-note">*Required.</span>
+    </label>
+    <label>
+      Last Name
+      <input type="text" autocomplete="family-name" name="account_lastname" required>
+      <span class="required-note">*Required.</span>
+    </label>
+    <label>
+      Email
+      <input type="email" autocomplete="email" name="account_email" required>
+      <span class="required-note">*Required. Must be a valid email address.</span>
+    </label>
+    <div class="label">
+      <label for="password">Password</label>
+      <div class="password-wrapper">
+        <input type="password" autocomplete="new-password" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$" name="account_password" id="password" required>
+        <button type="button" class="password-toggle" aria-label="Show password">
+          <!-- Eye icon -->
+          <svg class="eye hidden" viewBox="0 0 24 24">
+            <path d="M12 4.5C7.305 4.5 3.35 7.36 1.5 12c1.85 4.64 5.805 7.5 10.5 7.5s8.65-2.86 10.5-7.5C20.65 7.36 16.695 4.5 12 4.5zm0 12a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z" fill="currentColor"/>
+            <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+          </svg>
+          <!-- Eye slash icon -->
+          <svg class="eye-slash" viewBox="0 0 24 24">
+            <path d="M12 4.5C7.305 4.5 3.35 7.36 1.5 12c1.85 4.64 5.805 7.5 10.5 7.5s8.65-2.86 10.5-7.5C20.65 7.36 16.695 4.5 12 4.5zm0 12a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9z" fill="currentColor"/>
+            <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+            <line x1="2" y1="2" x2="22" y2="22" stroke="currentColor" stroke-width="3"/>
+          </svg>
+        </button>
+      </div>
+      <span class="required-note">*Required. Password must include at least 12 characters including at least one capital letter, at least one number, and at least one special character.</span>
+    </div>
+    <input type="submit" value="Register" disabled>
+  </form>
+  <p>
+    Already have an account?
+    <a href="login">Login</a>
+  </p>
+</div>

@@ -69,6 +69,88 @@ header a {
 	text-align: center;
 }
 
+label, .label {
+	display: block;
+	margin: 0.5rem 0;
+	width: max-content;
+	max-width: 100%;
+}
+.label label {
+	margin: 0;
+	width: 100%;
+}
+input {
+	display: block;
+}
+input[type=text], input[type=email], input[type=password] {
+	font-size: inherit;
+	padding: 12px 8px;
+	border: 1px solid var(--back-2);
+	border-radius: 0.75rem;
+	width: 22rem;
+	max-width: 100%;
+}
+.required-note {
+	visibility: hidden;
+	font-size: 0.85em;
+}
+:invalid + .required-note, .password-wrapper:has(:invalid) + .required-note {
+	visibility: visible;
+}
+
+input[type=submit] {
+	font-size: 1.25em;
+	background-color: inherit;
+	border: 1px solid;
+	border-radius: 0;
+	cursor: pointer;
+	padding: 0.6rem 0.75rem;
+}
+
+.password-wrapper {
+  position: relative;
+  width: max-content;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22px;
+  transition: background-color 0.2s;
+}
+
+.password-toggle:hover {
+  background-color: rgba(0,0,0,0.05);
+}
+
+.password-toggle svg {
+  width: 24px;
+  height: 24px;
+  color: var(--text-1);
+  opacity: 0.75;
+}
+
+.password-toggle svg.hidden {
+  display: none;
+}
+
+.error-notice {
+	border: 1px solid;
+	border-radius: 0.75rem;
+	padding: 0.5rem 0 0.5rem 1.5rem;
+}
+
 footer {
 	margin-top: 2rem;
 }

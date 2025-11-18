@@ -12,6 +12,7 @@ errCont.buildError = async function (req, res, next) {
     title: "Error",
     pageStyle: null,
     nav,
+    errors: null,
   })
 }
 

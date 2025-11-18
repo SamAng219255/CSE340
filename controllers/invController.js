@@ -17,6 +17,7 @@ invCont.buildByClassificationId = async function (req, res, next) {
     pageStyle: "inventory",
     nav,
     grid,
+    errors: null,
   })
 }
 
@@ -34,6 +35,7 @@ invCont.buildByVehicleId = async function (req, res, next) {
     pageStyle: "vehicle",
     nav,
     description,
+    errors: null,
   });
 }
 
