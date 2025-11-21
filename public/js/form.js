@@ -1,11 +1,11 @@
 document.querySelectorAll('form').forEach(
-  form => form.querySelectorAll('input[required]').forEach(
-    input => input.addEventListener(
-      'input',
-      () => 
-      form.querySelector('input[type=submit]').disabled = !Array(...form.querySelectorAll('input[required]')).every(input => input.checkValidity())
-    )
-  )
+  form => {
+    const check = () => form.querySelector('input[type=submit]').disabled = !Array(...form.querySelectorAll('input[required]')).every(input => input.checkValidity())
+    form.querySelectorAll('input[required]').forEach(
+      input => input.addEventListener('input', check)
+    );
+    check();
+  }
 );
 
 document.querySelectorAll('.password-wrapper').forEach(wrapper => {

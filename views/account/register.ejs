@@ -13,17 +13,17 @@
   <form action="/account/register" method="post">
     <label>
       First Name
-      <input type="text" autocomplete="given-name" name="account_firstname" required>
+      <input type="text" autocomplete="given-name" name="account_firstname" value="<%= locals.account_firstname %>" required>
       <span class="required-note">*Required.</span>
     </label>
     <label>
       Last Name
-      <input type="text" autocomplete="family-name" name="account_lastname" required>
+      <input type="text" autocomplete="family-name" name="account_lastname" value="<%= locals.account_lastname %>" required>
       <span class="required-note">*Required.</span>
     </label>
     <label>
       Email
-      <input type="email" autocomplete="email" name="account_email" required>
+      <input type="email" autocomplete="email" name="account_email" value="<%= locals.account_email %>" required>
       <span class="required-note">*Required. Must be a valid email address.</span>
     </label>
     <div class="label">

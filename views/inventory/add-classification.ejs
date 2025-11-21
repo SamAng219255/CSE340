@@ -1,0 +1,21 @@
+<h1><%= title %></h1>
+
+<%- messages() %>
+
+<div id="login-box">
+  <% if (errors) { %>
+    <ul class="error-notice">
+   <% errors.array().forEach(error => { %>
+     <li><%= error.msg %></li>
+  <%  }) %>
+   </ul>
+  <% } %>
+  <form action="/inv/add/type" method="post">
+    <label>
+      Classification Name
+      <input type="text" name="classification_name" pattern="^[0-9a-zA-Z]+$" value="<%= locals.classification_name %>" required>
+      <span class="required-note">*Required. Alphanumeric values only. Name cannot contain spaces or special characters.</span>
+    </label>
+    <input type="submit" value="Add Type" disabled>
+  </form>
+</div>

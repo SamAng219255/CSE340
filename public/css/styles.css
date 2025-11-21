@@ -79,16 +79,18 @@ label, .label {
 	margin: 0;
 	width: 100%;
 }
-input {
+input, textarea, select {
 	display: block;
 }
-input[type=text], input[type=email], input[type=password] {
+input[type=text], input[type=email], input[type=password], input[type=number], textarea, select {
 	font-size: inherit;
 	padding: 12px 8px;
 	border: 1px solid var(--back-2);
 	border-radius: 0.75rem;
 	width: 22rem;
 	max-width: 100%;
+	margin: 2px 0 0 -1px;
+	font-family: inherit;
 }
 .required-note {
 	visibility: hidden;
@@ -149,6 +151,17 @@ input[type=submit] {
 	border: 1px solid;
 	border-radius: 0.75rem;
 	padding: 0.5rem 0 0.5rem 1.5rem;
+}
+
+.box-list {
+	list-style: none;
+	background-color: inherit;
+	border: 1px solid var(--text-1);
+	padding: 0.5rem 1rem;
+	width: max-content;
+}
+.box-list li {
+	margin: 0.5rem 0;
 }
 
 footer {
