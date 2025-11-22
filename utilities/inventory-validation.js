@@ -13,6 +13,7 @@ validate.addTypeRules = () => {
     .trim()
     .escape()
     .notEmpty()
+    .isAlphanumeric()
     .withMessage("Invalid classification name.")
     .custom(async (classification_name) => {
       const classificationExists = await inventoryModel.checkExistingClassificationName(classification_name);

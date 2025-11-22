@@ -91,7 +91,7 @@ Util.handleErrors = fn => (req, res, next) => Promise.resolve(fn(req, res, next)
 * ************************************ */
 Util.getClassificationOptions = async function(selectedOption) {
   const data = await invModel.getClassifications();
-  return data.rows.reduce((acc, row) => acc + 
+  return '<option value="">———</option>' + data.rows.reduce((acc, row) => acc + 
     `<option value="${row.classification_id}"${parseInt(selectedOption) === parseInt(row.classification_id) ? ' selected' : ''}>${row.classification_name}</option>`,
   '');
 }

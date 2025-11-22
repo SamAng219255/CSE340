@@ -23,12 +23,12 @@
     </label>
     <label>
       Year
-      <input type="number" name="inv_year" pattern="[0-9]{4}" value="<%= locals.inv_year %>" required>
+      <input type="number" min="1000" max="9999" step="1" name="inv_year" value="<%= locals.inv_year %>" required>
       <span class="required-note">*Required. Must be a four (4) digit year.</span>
     </label>
     <label>
       Description
-      <textarea type="text" name="inv_description" required><%= locals.inv_description %></textarea>
+      <textarea name="inv_description" required><%= locals.inv_description %></textarea>
       <span class="required-note">*Required.</span>
     </label>
     <label>
@@ -43,12 +43,12 @@
     </label>
     <label>
       Price
-      <input type="number" name="inv_price" pattern="[0-9]+" value="<%= locals.inv_price %>" required>
+      <input type="number" min="1" max="999999999" step="1" name="inv_price" value="<%= locals.inv_price %>" required>
       <span class="required-note">*Required. Must be a whole number of dollars.</span>
     </label>
     <label>
       Miles
-      <input type="number" name="inv_miles" pattern="[0-9]+" value="<%= locals.inv_miles %>" required>
+      <input type="number" min="0" step="1" name="inv_miles" value="<%= locals.inv_miles %>" required>
       <span class="required-note">*Required. Must be a whole number of miles.</span>
     </label>
     <label>
@@ -61,6 +61,7 @@
       <select name="classification_id" id="classification_id" required>
         <%- locals.classificationOptions %>
       </select>
+      <span class="required-note">*Required.</span>
     </label>
     <input type="submit" value="Add Item" disabled>
   </form>
