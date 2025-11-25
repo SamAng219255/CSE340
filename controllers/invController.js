@@ -44,11 +44,13 @@ invCont.buildByVehicleId = async function (req, res, next) {
  * ************************** */
 invCont.buildManagement = async function (req, res, next) {
   let nav = await utilities.getNav();
+  const classificationOptions = await utilities.getClassificationOptions()
   res.render("./inventory/management", {
     title: "Manage Inventory",
     pageStyle: null,
     nav,
     errors: null,
+    classificationOptions,
   });
 }
 
@@ -124,6 +126,7 @@ invCont.addInventoryItem = async function (req, res, next) {
     inv_color,
     classification_id
   } = req.body;
+  const classificationOptions = await utilities.getClassificationOptions(classification_id);
 
   const addResult = await invModel.addInventoryItem(
     inv_make,
@@ -148,16 +151,136 @@ invCont.addInventoryItem = async function (req, res, next) {
       pageStyle: null,
       nav,
       errors: null,
+      classificationOptions,
     });
   }
   else {
-    const classificationOptions = await utilities.getClassificationOptions(classification_id);
     req.flash("notice", "Failed to add inventory item.")
     res.status(501).render("inventory/add-inventory", {
       pageStyle: null,
       title: "Add New Inventory Item",
       nav,
       errors: null,
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_description,
+      inv_image,
+      inv_thumbnail,
+      inv_price,
+      inv_miles,
+      inv_color,
+      classificationOptions,
+    })
+  }
+}
+
+/* ***************************
+ *  Return Inventory by Classification As JSON
+ * ************************** */
+invCont.getInventoryJSON = async (req, res, next) => {
+  const classification_id = parseInt(req.params.classification_id)
+  const invData = await invModel.getInventoryByClassificationId(classification_id)
+  if (invData[0].inv_id) {
+    return res.json(invData)
+  } else {
+    next(new Error("No data returned"))
+  }
+}
+
+/* ***************************
+ *  Build edit inventory view
+ * ************************** */
+invCont.buildEditInventory = async function (req, res, next) {
+  const inv_id = parseInt(req.params.inv_id);
+  let nav = await utilities.getNav();
+  const data = await invModel.getInventoryByVehicleId(inv_id);
+  const {
+    inv_make,
+    inv_model,
+    inv_year,
+    inv_description,
+    inv_image,
+    inv_thumbnail,
+    inv_price,
+    inv_miles,
+    inv_color,
+    classification_id
+  } = data[0];
+  const name = `${inv_make} ${inv_model}`;
+  const classificationOptions = await utilities.getClassificationOptions(classification_id);
+  res.render("./inventory/edit-inventory", {
+    title: `Edit ${name}`,
+    pageStyle: null,
+    nav,
+    errors: null,
+    inv_id,
+    inv_make,
+    inv_model,
+    inv_year,
+    inv_description,
+    inv_image,
+    inv_thumbnail,
+    inv_price,
+    inv_miles,
+    inv_color,
+    classificationOptions,
+  });
+}
+invCont.editInventoryItem = async function (req, res, next) {
+  let nav = await utilities.getNav();
+  const {
+    inv_id,
+    inv_make,
+    inv_model,
+    inv_year,
+    inv_description,
+    inv_image,
+    inv_thumbnail,
+    inv_price,
+    inv_miles,
+    inv_color,
+    classification_id
+  } = req.body;
+  const classificationOptions = await utilities.getClassificationOptions(classification_id);
+
+  const editResult = await invModel.editInventoryItem(
+    inv_id,
+    inv_make,
+    inv_model,
+    inv_year,
+    inv_description,
+    inv_image,
+    inv_thumbnail,
+    inv_price,
+    inv_miles,
+    inv_color,
+    classification_id
+  );
+
+  if (editResult) {
+    req.flash(
+      "notice",
+      `Successfully edited "${inv_year} ${inv_make} ${inv_model}".`
+    )
+    res.status(201).render("./inventory/management", {
+      title: "Manage Inventory",
+      pageStyle: null,
+      nav,
+      errors: null,
+      classificationOptions,
+    });
+  }
+  else {
+    const oldData = await invModel.getInventoryByVehicleId(inv_id);
+    const name = `${oldData.inv_make} ${oldData.inv_model}`;
+    req.flash("notice", "Failed to edit inventory item.")
+    res.status(501).render("inventory/edit-inventory", {
+      pageStyle: null,
+      title: `Edit ${name}`,
+      nav,
+      errors: null,
+      inv_id,
       inv_make,
       inv_model,
       inv_year,

@@ -30,6 +30,18 @@ router.post("/add/vehicle",
 );
 
 // Route to management view
-router.get("/", utilities.handleErrors(invController.buildManagement));
+router.get("/", utilities.checkLoginEmployee, utilities.handleErrors(invController.buildManagement));
+
+// Route to inventory API
+router.get("/getInventory/:classification_id", utilities.handleErrors(invController.getInventoryJSON));
+
+// Route to modify inventory view
+router.get("/edit/:inv_id", utilities.handleErrors(invController.buildEditInventory));
+// Route to process editting inventory item
+router.post("/edit/", 
+  invValidate.editVehicleRules(),
+  invValidate.checkEditVehicleData,
+  utilities.handleErrors(invController.editInventoryItem)
+);
 
 module.exports = router;

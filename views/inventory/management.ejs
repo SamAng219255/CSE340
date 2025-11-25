@@ -6,3 +6,17 @@
   <li><a href="/inv/add/type">add new classification</a></li>
   <li><a href="/inv/add/vehicle">add new inventory</a></li>
 </ul>
+
+<h2>Manage Inventory</h2>
+
+<p>Select a classification from the options below to view the items belonging to it.</p>
+
+<select id="classification-select">
+  <%- classificationOptions %>
+</select>
+
+<table id="inventory-display"></table>
+
+<noscript>JavaScript must be enabled to use this page.</noscript>
+
+<script src="../../js/inventory.js"></script>

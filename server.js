@@ -18,6 +18,8 @@ const errorRoute = require("./routes/errorRoute")
 const utilities = require("./utilities/")
 const session = require("express-session")
 const pool = require('./database/')
+const cookieParser = require('cookie-parser')
+const path = require('path');
 
 /* ***********************
  * Middleware
@@ -44,6 +46,12 @@ app.use(function(req, res, next){
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-www-form-urlencoded
 
+// Cookie Parser Middleware
+app.use(cookieParser())
+
+// Check for JWT token
+app.use(utilities.checkJWTToken)
+
 /* ***********************
  * View Engine and Templates
  *************************/
@@ -67,6 +75,14 @@ app.use("/account", accountRoute)
 
 // Error Testing route
 app.use("/error/yes", errorRoute)
+
+// Chrome DevTools automatic workspaces route — Included to silence errors from devtools attempting to connect while testing.
+app.get("/.well-known/appspecific/com.chrome.devtools.json", (req, res, next) => res.json({}))
+
+// Special File Not Found for images
+app.use("/images", async (req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, "public", "images", "vehicles", "no-image.png"))
+})
 
 // File Not Found Route - must be last route in list
 app.use(async (req, res, next) => {

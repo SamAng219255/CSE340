@@ -18,4 +18,8 @@ pnpm-lock.yaml
 
 README.md
 
+# The following files are associated with the app,
+# but aren't related to it's operation and shoudn't
+# be uploaded.
 cse340_motors.zip
+test_accounts.txt

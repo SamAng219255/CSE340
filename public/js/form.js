@@ -4,7 +4,10 @@ document.querySelectorAll('form').forEach(
     form.querySelectorAll('input[required]').forEach(
       input => input.addEventListener('input', check)
     );
-    check();
+    if(form.classList.contains('requires-update'))
+      form.querySelector('input[type=submit]').disabled = true;
+    else
+      check();
   }
 );
 

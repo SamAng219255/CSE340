@@ -1,4 +1,6 @@
 const invModel = require("../models/inventory-model")
+const jwt = require("jsonwebtoken")
+require("dotenv").config()
 const Util = {}
 
 /* ************************
@@ -94,6 +96,52 @@ Util.getClassificationOptions = async function(selectedOption) {
   return '<option value="">———</option>' + data.rows.reduce((acc, row) => acc + 
     `<option value="${row.classification_id}"${parseInt(selectedOption) === parseInt(row.classification_id) ? ' selected' : ''}>${row.classification_name}</option>`,
   '');
+}
+
+/* ****************************************
+* Middleware to check token validity
+**************************************** */
+Util.checkJWTToken = (req, res, next) => {
+ if (req.cookies.jwt) {
+  jwt.verify(
+   req.cookies.jwt,
+   process.env.ACCESS_TOKEN_SECRET,
+   function (err, accountData) {
+    if (err) {
+     req.flash("Please log in")
+     res.clearCookie("jwt")
+     return res.redirect("/account/login")
+    }
+    res.locals.accountData = accountData
+    res.locals.loggedin = 1
+    next()
+   })
+ } else {
+  next()
+ }
+}
+
+/* ****************************************
+ *  Check Login
+ * ************************************ */
+Util.checkLogin = (req, res, next) => {
+  if (res.locals.loggedin) {
+    next()
+  }
+  else {
+    req.flash("notice", "Please log in.")
+    return res.redirect("/account/login")
+  }
+}
+
+Util.checkLoginEmployee = (req, res, next) => {
+  if (res.locals.loggedin && ['Employee', 'Admin'].includes(res.locals.accountData.account_type)) {
+    next()
+  }
+  else {
+    req.flash("notice", "Invalid Permissions.")
+    return res.redirect("/account/login")
+  }
 }
 
 module.exports = Util
