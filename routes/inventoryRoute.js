@@ -44,4 +44,13 @@ router.post("/edit/",
   utilities.handleErrors(invController.editInventoryItem)
 );
 
+// Route to delete inventory confirmation view
+router.get("/delete/:inv_id", utilities.handleErrors(invController.buildDeleteInventoryConfirm));
+// Route to process deleting inventory item
+router.post("/delete/", 
+  invValidate.deleteVehicleRules(),
+  invValidate.checkDeleteVehicleData,
+  utilities.handleErrors(invController.deleteInventoryItem)
+);
+
 module.exports = router;

@@ -186,7 +186,7 @@ validate.checkAddTypeData = async (req, res, next) => {
 }
 
 /*  **********************************
-*  Add Vehicle Validation Rules
+*  Edit Vehicle Validation Rules
 * ********************************* */
 validate.editVehicleRules = () => {
   return [
@@ -274,7 +274,7 @@ validate.editVehicleRules = () => {
 }
 
 /* ******************************
- * Check data and return errors or continue to addType
+ * Check data and return errors or continue to edit
  * ***************************** */
 validate.checkEditVehicleData = async (req, res, next) => {
   const {
@@ -314,6 +314,63 @@ validate.checkEditVehicleData = async (req, res, next) => {
       inv_miles,
       inv_color,
       classificationOptions,
+    })
+    return
+  }
+  next()
+}
+
+/*  **********************************
+*  Delete Vehicle Validation Rules
+* ********************************* */
+validate.deleteVehicleRules = () => {
+  return [
+    body("inv_id")
+    .trim()
+    .escape()
+    .notEmpty()
+    .withMessage("Missing inventory item id. Please return to management page and try again.")
+    .custom(async (inv_id) => {
+      const inventoryExists = await inventoryModel.checkExistingInventoryId(inv_id);
+      if(!inventoryExists) {
+        throw new Error("Invalid inventory item id. Please return to management page and try again.")
+      }
+    }),
+  ]
+}
+
+/* ******************************
+ * Check data and return errors or continue to delete
+ * ***************************** */
+validate.checkDeleteVehicleData = async (req, res, next) => {
+  let {
+    inv_id,
+    inv_make,
+    inv_model,
+    inv_year,
+    inv_price,
+  } = req.body;
+
+  let errors = []
+  errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    let nav = await utilities.getNav();
+    const oldData = await invModel.getInventoryByVehicleId(inv_id);
+    inv_make = oldData.inv_make || inv_make;
+    inv_model = oldData.inv_model || inv_model;
+    inv_year = oldData.inv_year || inv_year;
+    inv_price = oldData.inv_price || inv_price;
+    const name = `${inv_make} ${inv_model}`;
+    res.render("inventory/delete-inventory", {
+      errors,
+      pageStyle: null,
+      title: `Delete ${name}`,
+      nav,
+      inv_id,
+      inv_make,
+      inv_model,
+      inv_year,
+      inv_price,
     })
     return
   }
