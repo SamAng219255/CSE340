@@ -144,4 +144,28 @@ Util.checkLoginEmployee = (req, res, next) => {
   }
 }
 
+Util.checkAllowedLogin = ({minimumLevel, maximumLevel, idIs, idMatchesParam = false, idMatchesPost = false, mode = 'or'}) => {
+  const accountLevels = ['Client', 'Employee', 'Admin'];
+  const minimumLevelInt = accountLevels.indexOf(minimumLevel);
+  const maximumLevelInt = accountLevels.indexOf(maximumLevel);
+  return (req, res, next) => {
+    if(res.locals.loggedin) {
+      const accountData = res.locals.accountData || {};
+      const accountLevel = accountLevels.indexOf(accountData.account_type);
+      const checks = [];
+      if(minimumLevel !== undefined)  checks.push(accountLevel >= minimumLevelInt);
+      if(maximumLevel !== undefined)  checks.push(accountLevel <= maximumLevelInt);
+      if(idIs !== undefined)          checks.push(accountData.account_id == idIs);
+      if(idMatchesParam)              checks.push(accountData.account_id == req.params.account_id);
+      if(idMatchesPost)               checks.push(accountData.account_id == req.body.account_id);
+      if (mode == 'or' ? checks.some(x => x) : checks.every(x => x)) {
+        next()
+        return
+      }
+    }
+    req.flash("notice", "Invalid Permissions.")
+    return res.redirect("/account/login")
+  }
+}
+
 module.exports = Util

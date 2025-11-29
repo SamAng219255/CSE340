@@ -3,16 +3,40 @@
 <%- messages() %>
 
 <div id="login-box">
-  <form action="/account/login" method="post">
+  <% if (errors) { %>
+    <ul class="error-notice">
+   <% errors.array().forEach(error => { %>
+     <li><%= error.msg %></li>
+  <%  }) %>
+   </ul>
+  <% } %>
+  <form action="/account/update" method="post"<% if(locals.initial) { %> class="requires-update"<% } %>>
+    <h3>Update Account Details</h3>
+    <label>
+      First Name
+      <input type="text" autocomplete="given-name" name="account_firstname" value="<%= locals.account_firstname %>" required>
+      <span class="required-note">*Required.</span>
+    </label>
+    <label>
+      Last Name
+      <input type="text" autocomplete="family-name" name="account_lastname" value="<%= locals.account_lastname %>" required>
+      <span class="required-note">*Required.</span>
+    </label>
     <label>
       Email
       <input type="email" autocomplete="email" name="account_email" value="<%= locals.account_email %>" required>
-      <span class="required-note">*Required. Invalid email.</span>
+      <span class="required-note">*Required. Must be a valid email address.</span>
     </label>
+    <input type="submit" name="submit" value="Update Details" disabled>
+    <input type="hidden" name="account_id" value="<%= locals.account_id %>">
+  </form>
+  <hr>
+  <form action="/account/update" method="post">
+    <h3>Change Password</h3>
     <div class="label">
       <label for="password">Password</label>
       <div class="password-wrapper">
-        <input type="password" autocomplete="current-password" name="account_password" id="password" required>
+        <input type="password" autocomplete="new-password" pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$" name="account_password" id="password" required>
         <button type="button" class="password-toggle" aria-label="Show password">
           <!-- Eye icon -->
           <svg class="eye hidden" viewBox="0 0 24 24">
@@ -29,10 +53,7 @@
       </div>
       <span class="required-note">*Required. Password must include at least 12 characters including at least one capital letter, at least one number, and at least one special character.</span>
     </div>
-    <input type="submit" value="Login" disabled>
+    <input type="submit" name="submit" value="Change Password" disabled>
+    <input type="hidden" name="account_id" value="<%= locals.account_id %>">
   </form>
-  <p>
-    No Account?
-    <a href="register">Sign-up</a>
-  </p>
 </div>

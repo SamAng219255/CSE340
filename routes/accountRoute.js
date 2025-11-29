@@ -9,7 +9,17 @@ router.get("/login", utilities.handleErrors(accountController.buildLogin));
 
 router.get("/register", utilities.handleErrors(accountController.buildRegister));
 
-router.get("/", utilities.checkLogin, utilities.handleErrors(accountController.buildManagement));
+router.get("/",
+  utilities.checkLogin,
+  utilities.handleErrors(accountController.buildManagement)
+);
+
+router.get("/update/:account_id",
+  utilities.checkAllowedLogin({minimumLevel: 'Admin', idMatchesParam: true, mode: 'or'}),
+  utilities.handleErrors(accountController.buildUpdate)
+);
+
+router.get("/logout", utilities.handleErrors(accountController.logout));
 
 // Process the registration data
 router.post(
@@ -26,5 +36,12 @@ router.post(
   accValidate.checkLoginData,
   utilities.handleErrors(accountController.accountLogin)
 )
+
+router.post("/update/",
+  accValidate.updateRules(),
+  accValidate.checkUpdateData,
+  utilities.checkAllowedLogin({minimumLevel: 'Admin', idMatchesPost: true, mode: 'or'}),
+  utilities.handleErrors(accountController.updateInfo)
+);
 
 module.exports = router;

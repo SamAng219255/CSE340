@@ -108,6 +108,9 @@ input[type=submit] {
 	cursor: pointer;
 	padding: 0.6rem 0.75rem;
 }
+input[type=submit][disabled] {
+	cursor: not-allowed;
+}
 
 .password-wrapper {
   position: relative;

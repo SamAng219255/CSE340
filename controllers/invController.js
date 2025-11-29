@@ -226,6 +226,7 @@ invCont.buildEditInventory = async function (req, res, next) {
     inv_miles,
     inv_color,
     classificationOptions,
+    initial: true
   });
 }
 invCont.editInventoryItem = async function (req, res, next) {

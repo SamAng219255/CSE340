@@ -130,7 +130,7 @@ async function accountLogin(req, res) {
 }
 
 /* ****************************************
-*  Deliver register view
+*  Deliver account management view
 * *************************************** */
 async function buildManagement(req, res, next) {
   let nav = await utilities.getNav()
@@ -142,4 +142,132 @@ async function buildManagement(req, res, next) {
   })
 }
 
-module.exports = { buildLogin, buildRegister, registerAccount, accountLogin, buildManagement }
+/* ****************************************
+*  Deliver update account information view
+* *************************************** */
+async function buildUpdate(req, res, next) {
+  const nav = await utilities.getNav();
+  const {
+    account_id,
+    account_firstname,
+    account_lastname,
+    account_email,
+    account_type,
+  } = await accountModel.getAccountById(req.params.account_id)
+  res.render("account/update", {
+    title: `Account Information for ${account_firstname} ${account_lastname}`,
+    pageStyle: null,
+    nav,
+    errors: null,
+    account_id,
+    account_firstname,
+    account_lastname,
+    account_email,
+    account_type,
+    initial: true
+  })
+}
+
+/* ****************************************
+ *  Process update request
+ * ************************************ */
+async function updateInfo(req, res) {
+  let nav = await utilities.getNav()
+  const { account_id, submit, account_password } = req.body;
+  const accountData = await accountModel.getAccountById(account_id);
+  const account_firstname = req.body.account_firstname || accountData.account_firstname
+  const account_lastname = req.body.account_lastname || accountData.account_lastname
+  const account_email = req.body.account_email || accountData.account_email
+
+  const messages = {sucess: "An unknown success has occured.", failure: "An unknown error has occured."};
+  let updateResult = false;
+
+  if(submit == 'Change Password') {
+    // Hash the password before storing
+    let hashedPassword
+    try {
+      // regular password and cost (salt is generated automatically)
+      hashedPassword = await bcrypt.hashSync(account_password, 10)
+    }
+    catch (error) {
+      req.flash("notice", 'Sorry, there was an error processing the password update.')
+      res.status(500).render("account/update", {
+        title: `Account Information for ${account_firstname} ${account_lastname}`,
+        pageStyle: null,
+        nav,
+        errors: null,
+        account_firstname,
+        account_lastname,
+        account_email,
+        account_id,
+      })
+      return;
+    }
+
+    [messages.sucess, messages.failure] = [
+      'Your password has been successfully updated',
+      'Sorry, there was an error updating your password'
+    ];
+
+    updateResult = await accountModel.updateAccountPassword(
+      account_id,
+      hashedPassword
+    );
+  }
+  else if(submit == 'Update Details') {
+    [messages.sucess, messages.failure] = [
+      'Your information has been successfully updated',
+      'Sorry, there was an error updating your information'
+    ]
+
+    updateResult = await accountModel.updateAccountData(
+      account_id,
+      account_firstname,
+      account_lastname,
+      account_email
+    );
+  }
+
+  if (updateResult) {
+    req.flash("notice", messages.sucess)
+    res.render("account/manage", {
+      title: "Account",
+      pageStyle: null,
+      nav,
+      errors: null,
+    })
+  }
+  else {
+    req.flash("notice", messages.failure)
+    res.status(501).render("account/update", {
+      title: `Account Information for ${account_firstname} ${account_lastname}`,
+      pageStyle: null,
+      nav,
+      errors: null,
+      account_firstname,
+      account_lastname,
+      account_email,
+      account_id,
+    })
+  }
+}
+
+/* ****************************************
+ *  Notify of logout and send to home.
+ * ************************************ */
+async function logout(req, res) {
+  res.clearCookie("jwt");
+  req.flash("notice", "You have been successfully logged out!");
+  return res.redirect("/");
+}
+
+module.exports = { 
+  buildLogin,
+  buildRegister, 
+  registerAccount,
+  accountLogin,
+  buildManagement,
+  buildUpdate,
+  updateInfo,
+  logout,
+}
