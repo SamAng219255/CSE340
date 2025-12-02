@@ -1,6 +1,7 @@
 const utilities = require(".")
 const { body, validationResult } = require("express-validator")
 const inventoryModel = require("../models/inventory-model")
+const commentModel = require("../models/comment-model")
 const validate = {}
 
 /*  **********************************
@@ -372,6 +373,82 @@ validate.checkDeleteVehicleData = async (req, res, next) => {
       inv_year,
       inv_price,
     })
+    return
+  }
+  next()
+}
+
+/*  **********************************
+*  Comment Management Validation Rules
+* ********************************* */
+validate.commentRules = () => {
+  return [
+    body("action")
+      .unescape()
+      .isIn(["Post Review", "Delete Review", "Edit Review"]),
+
+    body("comment_body")
+      .if(body("action").unescape().isIn(["Post Review", "Edit Review"]))
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage("Please provide text for the review."),
+
+    body("comment_id")
+      .if(body("action").unescape().isIn(["Delete Review", "Edit Review"]))
+      .trim()
+      .escape()
+      .notEmpty()
+      .withMessage("Missing comment id. Please try again.")
+      .custom(async (comment_id) => {
+        const commentExists = await commentModel.checkExistingCommentId(comment_id);
+        if(!commentExists) {
+          throw new Error("Comment does not exist. It may have been deleted. If you believe this to be a mistake, please try again later.")
+        }
+      }),
+  ]
+}
+
+/* ******************************
+ * Check data and return errors or continue
+ * ***************************** */
+validate.checkCommentData = async (req, res, next) => {
+  const {
+    action,
+    comment_id,
+    comment_body,
+  } = req.body
+
+  let errors = []
+  errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    const commentOptions = {
+      loggedin: res.locals.loggedin,
+      accountData: res.locals.accountData,
+    };
+    if(action == 'Post Review') {
+      commentOptions.postStickyText = comment_body;
+    }
+    else if(action == 'Edit Review') {
+      commentOptions.editStickyText = comment_body;
+      commentOptions.editStickyId = comment_id;
+    }
+
+    const inv_id = req.params.vehicleId;
+    const invData = await inventoryModel.getInventoryByVehicleId(inv_id);
+    const commentData = await commentModel.getCommentsByInventoryId(inv_id);
+    const description = await utilities.buildVehicleDescription(invData[0]);
+    const commentSection = await utilities.buildCommentsSection(commentData, inv_id, commentOptions);
+    const nav = await utilities.getNav();
+    const vehicleName = `${invData[0].inv_year} ${invData[0].inv_make} ${invData[0].inv_model}`;
+    res.render("./inventory/vehicle", {
+      errors,
+      title: vehicleName,
+      pageStyle: "vehicle",
+      nav,
+      description,
+      commentSection,
+    });
     return
   }
   next()

@@ -53,6 +53,7 @@ header a {
 	padding: 0;
 	display: flex;
 	justify-content: space-around;
+	flex-wrap: wrap;
 }
 
 #main-nav li {
@@ -92,6 +93,9 @@ input[type=text], input[type=email], input[type=password], input[type=number], t
 	margin: 2px 0 0 -1px;
 	font-family: inherit;
 }
+textarea {
+	resize: none;
+}
 .required-note {
 	visibility: hidden;
 	font-size: 0.85em;
@@ -100,7 +104,7 @@ input[type=text], input[type=email], input[type=password], input[type=number], t
 	visibility: visible;
 }
 
-input[type=submit] {
+input[type=submit], button {
 	font-size: 1.25em;
 	background-color: inherit;
 	border: 1px solid;
@@ -108,7 +112,7 @@ input[type=submit] {
 	cursor: pointer;
 	padding: 0.6rem 0.75rem;
 }
-input[type=submit][disabled] {
+input[type=submit][disabled], button[disabled] {
 	cursor: not-allowed;
 }
 
@@ -169,6 +173,18 @@ input[type=submit][disabled] {
 
 footer {
 	margin-top: 2rem;
+}
+
+dialog {
+	padding: 1rem;
+	background-color: var(--back-1);
+	color: var(--text-1);
+	border: 3px solid var(--back-2);
+	border-radius: 1rem;
+}
+dialog::backdrop {
+	background-color: #101418;
+	opacity: 0.67;
 }
 
 @media screen and (min-width: 600px) {

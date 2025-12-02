@@ -16,6 +16,62 @@
 	background-color: var(--back-2-transparent);
 }
 
+.comments {
+	padding: 0.5rem;
+}
+.comments-list {
+	border: 1px solid var(--text-1);
+	padding: 0;
+	list-style: none;
+}
+.comments-comment:nth-child(even) {
+	background-color: var(--back-2-transparent);
+}
+.comments-comment {
+	display: grid;
+	padding: 0.25rem;
+}
+.comment-user {
+	grid-row: 2/3;
+	margin: 0.5rem 0;
+}
+.comment-user::before {
+	content: " — ";
+	padding-left: 1rem;
+}
+.comment-buttons {
+	grid-row: 2/3;
+	grid-column: 2/3;
+	justify-self: end;
+	width: fit-content;
+}
+.comment-buttons button {
+	border: none;
+	background-color: unset;
+	font-size: inherit;
+	color: inherit;
+	cursor: pointer;
+	padding: 10px;
+}
+.comment-buttons .comment-edit:hover {
+	color: #000000;
+}
+.comment-buttons .comment-delete:hover {
+	color: #7a0000;
+}
+
+.comment-add label, .comment-add textarea {
+	width: 100%;
+}
+
+dialog p {
+	margin: 0 0 0.5rem;
+}
+dialog div {
+	display: flex;
+	justify-content: space-evenly;
+}
+
 @media screen and (min-width: 600px) {
 	main {
 		display: grid;
@@ -24,7 +80,7 @@
 		align-items: center;
 	}
 
-	h1 {
+	.title, .comments {
 		grid-column: 1/3;
 	}
 

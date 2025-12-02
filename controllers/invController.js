@@ -1,4 +1,5 @@
 const invModel = require("../models/inventory-model")
+const commentModel = require("../models/comment-model")
 const utilities = require("../utilities/")
 
 const invCont = {}
@@ -25,16 +26,19 @@ invCont.buildByClassificationId = async function (req, res, next) {
  *  Build inventory by vehicle view
  * ************************** */
 invCont.buildByVehicleId = async function (req, res, next) {
-  const vehicle_id = req.params.vehicleId;
-  const data = await invModel.getInventoryByVehicleId(vehicle_id);
-  const description = await utilities.buildVehicleDescription(data[0]);
+  const inv_id = req.params.vehicleId;
+  const invData = await invModel.getInventoryByVehicleId(inv_id);
+  const commentData = await commentModel.getCommentsByInventoryId(inv_id);
+  const description = await utilities.buildVehicleDescription(invData[0]);
+  const commentSection = await utilities.buildCommentsSection(commentData, inv_id, {loggedin: res.locals.loggedin, accountData: res.locals.accountData});
   let nav = await utilities.getNav();
-  const vehicleName = `${data[0].inv_year} ${data[0].inv_make} ${data[0].inv_model}`;
+  const vehicleName = `${invData[0].inv_year} ${invData[0].inv_make} ${invData[0].inv_model}`;
   res.render("./inventory/vehicle", {
     title: vehicleName,
     pageStyle: "vehicle",
     nav,
     description,
+    commentSection,
     errors: null,
   });
 }
@@ -339,7 +343,9 @@ invCont.deleteInventoryItem = async function (req, res, next) {
   inv_year = oldData.inv_year || inv_year;
   inv_price = oldData.inv_price || inv_price;
 
-  const deleteResult = await invModel.deleteInventoryItem(inv_id);
+  const deleteCommentsResult = await commentModel.deleteCommentsByInventoryId(inv_id);
+
+  const deleteResult = deleteCommentsResult ? await invModel.deleteInventoryItem(inv_id) : false;
 
   if (deleteResult) {
     const classificationOptions = await utilities.getClassificationOptions();
@@ -370,6 +376,77 @@ invCont.deleteInventoryItem = async function (req, res, next) {
       inv_price,
     })
   }
+}
+
+/* ***************************
+ *  Process Comment Actions
+ * ************************** */
+invCont.handleComments = async function (req, res, next) {
+  const {
+    action,
+    comment_id,
+    comment_body,
+  } = req.body
+  const inv_id = req.params.vehicleId;
+  const invData = await invModel.getInventoryByVehicleId(inv_id);
+  const description = await utilities.buildVehicleDescription(invData[0]);
+  const nav = await utilities.getNav();
+  const vehicleName = `${invData[0].inv_year} ${invData[0].inv_make} ${invData[0].inv_model}`;
+  const commentOptions = {loggedin: res.locals.loggedin, accountData: res.locals.accountData};
+
+  const renderOptions = {message: "An unknown error has occured.", status: 501};
+
+  if(action == 'Post Review') {
+    const postResult = await commentModel.addComment(comment_body, res.locals.accountData.account_id, inv_id);
+
+    if(postResult) {
+      renderOptions.message = 'The review has been successfully posted.';
+      renderOptions.status = 201;
+    }
+    else {
+      renderOptions.message = 'Sorry, there was an error posting the review.';
+      renderOptions.status = 500;
+      commentOptions.postStickyText = comment_body;
+    }
+  }
+  else if(action == 'Edit Review') {
+    const editResult = await commentModel.editComment(comment_id, comment_body);
+
+    if(editResult) {
+      renderOptions.message = 'The review has been successfully edited.';
+      renderOptions.status = 201;
+    }
+    else {
+      renderOptions.message = 'Sorry, there was an error editing the review.';
+      renderOptions.status = 500;
+      commentOptions.editStickyText = comment_body;
+      commentOptions.editStickyId = comment_id;
+    }
+  }
+  else if(action == 'Delete Review') {
+    const deleteResult = await commentModel.deleteCommentById(comment_id);
+
+    if(deleteResult) {
+      renderOptions.message = 'The review has been successfully deleted.';
+      renderOptions.status = 201;
+    }
+    else {
+      renderOptions.message = 'Sorry, there was an error deleting the review.';
+      renderOptions.status = 500;
+    }
+  }
+
+  const commentData = await commentModel.getCommentsByInventoryId(inv_id);
+  const commentSection = await utilities.buildCommentsSection(commentData, inv_id, commentOptions);
+  req.flash("notice", renderOptions.message)
+  res.status(renderOptions.status).render("./inventory/vehicle", {
+    title: vehicleName,
+    pageStyle: "vehicle",
+    nav,
+    description,
+    commentSection,
+    errors: null,
+  });
 }
 
 module.exports = invCont

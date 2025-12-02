@@ -1,4 +1,5 @@
 const invModel = require("../models/inventory-model")
+const comModel = require("../models/comment-model")
 const jwt = require("jsonwebtoken")
 require("dotenv").config()
 const Util = {}
@@ -60,7 +61,7 @@ Util.buildClassificationGrid = async function(data){
 }
 
 /* **************************************
-* Build the classification view HTML
+* Build the vehicle view HTML
 * ************************************ */
 Util.buildVehicleDescription = async function(data){
   return `
@@ -144,11 +145,11 @@ Util.checkLoginEmployee = (req, res, next) => {
   }
 }
 
-Util.checkAllowedLogin = ({minimumLevel, maximumLevel, idIs, idMatchesParam = false, idMatchesPost = false, mode = 'or'}) => {
+Util.checkAllowedLogin = ({minimumLevel, maximumLevel, idIs, idMatchesParam = false, idMatchesPost = false, idMatches = false, mode = 'or'}) => {
   const accountLevels = ['Client', 'Employee', 'Admin'];
   const minimumLevelInt = accountLevels.indexOf(minimumLevel);
   const maximumLevelInt = accountLevels.indexOf(maximumLevel);
-  return (req, res, next) => {
+  return async (req, res, next) => {
     if(res.locals.loggedin) {
       const accountData = res.locals.accountData || {};
       const accountLevel = accountLevels.indexOf(accountData.account_type);
@@ -158,6 +159,7 @@ Util.checkAllowedLogin = ({minimumLevel, maximumLevel, idIs, idMatchesParam = fa
       if(idIs !== undefined)          checks.push(accountData.account_id == idIs);
       if(idMatchesParam)              checks.push(accountData.account_id == req.params.account_id);
       if(idMatchesPost)               checks.push(accountData.account_id == req.body.account_id);
+      if(idMatches)                   checks.push(await idMatches(accountData.account_id, req.body));
       if (mode == 'or' ? checks.some(x => x) : checks.every(x => x)) {
         next()
         return
@@ -167,5 +169,92 @@ Util.checkAllowedLogin = ({minimumLevel, maximumLevel, idIs, idMatchesParam = fa
     return res.redirect("/account/login")
   }
 }
+
+/* ****************************************
+ *  Check if comment owner matches given account id for login check
+ *  If comment_id is not provided, always passes
+ * ************************************ */
+Util.matchesComment = async (account_id, body) => {
+  if(body.comment_id === undefined)
+    return true;
+
+  const commentData = await comModel.getCommentById(body.comment_id);
+  return account_id == commentData.account_id;
+}
+
+/* ****************************************
+ *  Build the comments section html
+ * ************************************ */
+Util.buildCommentsSection = (commentsData, inv_id, {loggedin = 0, accountData = {}, postStickyText = '', editStickyText = '', editStickyId = 0} = {}) => {
+  let commentsStr = '<section class="comments"><h2>Reviews</h2><ul class="comments-list">';
+  commentsStr += commentsData.map(comment => {
+    const canManipulate = loggedin && 
+      (accountData.account_type == 'Admin' || accountData.account_id == comment.account_id);
+    const buttons = `
+      <div class="comment-buttons">
+        <button class="comment-delete">delete</button> | 
+        <button class="comment-edit">edit</button>
+      </div>`;
+    return `<li class="comments-comment" data-comment-id="${comment.comment_id}">
+      <span class="comment-body">${comment.comment_body}</span>
+      <span class="comment-user">${comment.account_name}</span>
+      ${canManipulate ? buttons : ''}
+    </li>`;
+  }).join('');
+  commentsStr += '</ul>'
+
+  if(loggedin) {
+    commentsStr += `
+      <form class="comment-add" action="/inv/detail/${inv_id}" method="post">
+        <label>
+          Got something to say? Add your own review and let us know how you liked it:
+          <textarea name="comment_body" required>${postStickyText}</textarea>
+        </label>
+        <input type="submit" name="action" value="Post Review">
+      </form>`;
+  }
+  else {
+    commentsStr += `
+      <div>
+        <span>Got something to say? <a href="/account/login">Log in</a> to add your own review and let us know how you liked it.</span>
+      </div>`;
+  }
+
+  commentsStr += '</section>';
+
+  const deleteDialog = `
+    <dialog id="comment-confirm">
+      <p>Are you sure you want to delete <span id="comment-confirm-user"></span> review?</p>
+      <p id="comment-confirm-body"></p>
+      <div>
+        <button id="comment-confirm-cancel">Cancel</button>
+        <form action="/inv/detail/${inv_id}" method="post">
+          <input type="hidden" name="comment_id" id="comment-confirm-id">
+          <input type="submit" name="action" value="Delete Review">
+        </form>
+      </div>
+    </dialog>
+  `;
+
+  const editDialog = `
+    <dialog id="comment-edit"${editStickyText ? ' class="open"' : ''}>
+      <form action="/inv/detail/${inv_id}" method="post" class="requires-update">
+        <label>
+          Edit review:
+          <textarea id="comment-edit-body" name="comment_body" required>${editStickyText}</textarea>
+        </label>
+        <input type="hidden" name="comment_id" id="comment-edit-id"${editStickyText ? ` value="${editStickyId}"` : ''}>
+        <div>
+          <button id="comment-edit-cancel">Cancel</button>
+          <input type="submit" name="action" value="Edit Review">
+        </div>
+      </form>
+    </dialog>
+  `;
+
+  return commentsStr + (loggedin ? deleteDialog + editDialog : '');
+}
+
+
 
 module.exports = Util

@@ -1,9 +1,15 @@
-<% if (title) { %>
-<h1><%= title %></h1>
-<% } else {
-  res.redirect('/')
-} %>
-
-<%- messages() %>
+<div class="title">
+  <h1><%= title %></h1>
+  <%- messages() %>
+  <% if (errors) { %>
+    <ul class="error-notice">
+   <% errors.array().forEach(error => { %>
+     <li><%= error.msg %></li>
+  <%  }) %>
+   </ul>
+  <% } %>
+</div>
 
 <%- description %>
+
+<%- commentSection %>

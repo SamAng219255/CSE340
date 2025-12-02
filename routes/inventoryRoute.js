@@ -8,8 +8,16 @@ const invValidate = require('../utilities/inventory-validation')
 // Route to build inventory by classification view
 router.get("/type/:classificationId", utilities.handleErrors(invController.buildByClassificationId));
 
-// Route to build inventory by classification view
+// Route to build inventory by inventory view
 router.get("/detail/:vehicleId", utilities.handleErrors(invController.buildByVehicleId));
+// Route to process comments by inventory item
+router.post(
+  "/detail/:vehicleId",
+  utilities.checkAllowedLogin({minimumLevel: 'Admin', idMatches: utilities.matchesComment, mode: 'or'}),
+  invValidate.commentRules(),
+  invValidate.checkCommentData,
+  utilities.handleErrors(invController.handleComments)
+);
 
 // Route to add classification view
 router.get("/add/type",
