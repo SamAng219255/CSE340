@@ -394,7 +394,7 @@ invCont.handleComments = async function (req, res, next) {
   const vehicleName = `${invData[0].inv_year} ${invData[0].inv_make} ${invData[0].inv_model}`;
   const commentOptions = {loggedin: res.locals.loggedin, accountData: res.locals.accountData};
 
-  const renderOptions = {message: "An unknown error has occured.", status: 501};
+  const renderOptions = {message: "An unknown error has occured.", status: 500};
 
   if(action == 'Post Review') {
     const postResult = await commentModel.addComment(comment_body, res.locals.accountData.account_id, inv_id);
